@@ -15,6 +15,17 @@ class MotorTest(unittest.TestCase):
     nodes = rosnode.get_node_names()
     self.assertIn('/motors', nodes, "node does not exist")
 
+  def test_put_freq(self):
+    pub = rospy.Publisher('/motor_raw', MotorFreqs)
+    m = MotorFreqs()
+    m.left_hz = 123
+    m.right_hz = 456
+    for i in range(10):
+      pub.publish(m)
+      time.sleep(0.1)
+    self.file_check('rtmotor_raw_l0', m.left_hz, "wrong left value from motor_raw")
+    self.file_check('rtmotor_raw_r0', m.right_hz, "wrong right value from motor_raw")
+
 if __name__ == '__main__':
   time.sleep(3)
   rospy.init_node('travis_test_motors')
