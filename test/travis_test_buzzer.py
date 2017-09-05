@@ -6,6 +6,7 @@ from pimouse_ros.msg import MusicAction, MusicResult, MusicFeedback, MusicGoal
 
 class BuzzerTest(unittest.TestCase):
   def setUp(self):
+    self.longMessage = True
     self.client = actionlib.SimpleActionClient("music", MusicAction)
     self.device_values = []
 
@@ -22,14 +23,13 @@ class BuzzerTest(unittest.TestCase):
     self.client.wait_for_result()
 
     self.assertTrue(self.client.get_result(), "invalid result")
-    self.assertEqual(goal.freqs, self.device_values, "invalid feedback:" + \
-      ",".join([str(e) for e in self.device_values]))
+    self.assertEqual(goal.freqs, self.device_values, "invalid feedback")
 
   def feedback_cb(self, feedback):
     with open("/dev/rtbuzzer0", "r") as r:
       data = r.readline()
       self.device_values.append(int(data.rstrip()))
-
+      
 if __name__ == '__main__':
   time.sleep(3)
   rospy.init_node('travis_test_buzzer')
