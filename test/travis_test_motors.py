@@ -5,8 +5,15 @@ import rosnode, rospy
 import time
 from pimouse_ros.msg import MotorFreqs
 from geometry_msgs.msg import Twist
+from std_srvs.srv import Trigger, TriggerResponse
 
 class MotorTest(unittest.TestCase):
+  def setUp(self):
+    rospy.wait_for_service('/motor_on')
+    rospy.wait_for_service('/motor_off')
+    on = rospy.ServiceProxy('/motor_on', Trigger)
+    ret = on()
+
   def file_check(self, dev, value, message):
    with open("/dev/" + dev, "r") as f:
      self.assertEqual(f.readline(), str(value) + "\n", message)
@@ -43,6 +50,5 @@ class MotorTest(unittest.TestCase):
 
 
 if __name__ == '__main__':
-  time.sleep(3)
   rospy.init_node('travis_test_motors')
   rostest.rosrun('pimouse_ros', 'travis_test_motors', MotorTest)
