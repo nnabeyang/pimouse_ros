@@ -14,8 +14,16 @@ def write_freq(hz=0):
 def recv_buzzer(data):
   write_freq(data.data)
 
-def exec_music(goal):pass
-
+def exec_music(goal):
+  r = MusicResult()
+  fb = MusicFeedback()
+  for i, f in enumerate(goal.freqs):
+    fb.remaining_steps = len(goal.freqs) - i
+    music.publish_feedback(fb)
+    write_freq(f)
+    rospy.sleep(1.0 if i >= len(goal.durations) else goal.durations[i])
+  r.finished = True
+  music.set_succeeded(r)
 if __name__ == '__main__':
   rospy.init_node('buzzer')
   rospy.Subscriber('buzzer', UInt16, recv_buzzer)
